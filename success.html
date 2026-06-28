@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thank you — Mint Studio</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="assets/favicon.svg">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav">
+    <a class="brand" href="index.html">
+      <svg class="logo-mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="40" height="40" rx="11" fill="#11d6a5"/><path d="M20 9c-4 4-9 6-9 12a9 9 0 1 0 18 0c0-6-5-8-9-12z" fill="#fff"/><circle cx="20" cy="22" r="3.4" fill="#11d6a5"/></svg>
+      <span data-mint="name">Mint Studio</span>
+    </a>
+    <div class="nav-cta"><a class="btn btn-ghost" href="index.html">← Home</a></div>
+  </div>
+</header>
+
+<section class="container">
+  <div class="success">
+    <div class="ok">
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#0bbf90" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+    </div>
+    <h1>Thank you — your order is in! 🎉</h1>
+    <p>We've received your order and payment confirmation. Our editors are on it, and you'll get your finished photos within your chosen turnaround.</p>
+    <p style="font-size:15px">A receipt and confirmation have been sent to your email. Questions? Reach us at <a data-mint="email" href="#" style="color:var(--mint-700);font-weight:700">our email</a>.</p>
+
+    <div id="order-recap" style="display:none;text-align:left;max-width:420px;margin:30px auto 0">
+      <div class="card" style="padding:22px">
+        <h3 style="font-size:16px;margin-bottom:12px">Your order</h3>
+        <pre id="recap-text" style="white-space:pre-wrap;font-family:inherit;font-size:13.5px;color:var(--ink-soft);margin:0"></pre>
+      </div>
+    </div>
+
+    <div class="actions">
+      <a class="btn btn-primary btn-lg" href="order.html">Place another order</a>
+      <a class="btn btn-ghost btn-lg" href="index.html">Back to home</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer" style="padding:36px 0 26px">
+  <div class="container footer-bottom" style="border:0;margin:0;padding:0">
+    <span>© <span data-mint="year">2026</span> <span data-mint="name">Mint Studio</span>.</span>
+    <span>Secure payments by Stripe</span>
+  </div>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/main.js"></script>
+<script>
+  (function () {
+    try {
+      var t = sessionStorage.getItem("mint_last_order");
+      if (t) {
+        document.getElementById("recap-text").textContent = t;
+        document.getElementById("order-recap").style.display = "block";
+      }
+    } catch (e) {}
+  })();
+</script>
+</body>
+</html>
