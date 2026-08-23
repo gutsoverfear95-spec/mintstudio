@@ -217,6 +217,13 @@ h1, h2, h3 { line-height: 1.12; letter-spacing: -0.02em; font-weight: 800; }
 .site-footer h4 { color: #fff; font-size: 14px; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 14px; }
 .site-footer a { color: #c7d6e3; display: block; margin-bottom: 9px; font-size: 15px; }
 .site-footer a:hover { color: var(--mint); }
+/* Buttons inside the footer keep their own colours (must beat .site-footer a) */
+.site-footer a.btn { display: inline-flex; margin-bottom: 0; font-size: 16px; }
+.site-footer a.btn-primary,
+.site-footer a.btn-primary:hover { color: #04241c; }
+.site-footer a.btn-primary:hover { background: var(--mint-600); }
+.site-footer a.btn-ghost,
+.site-footer a.btn-ghost:hover { color: var(--ink); }
 .footer-bottom { border-top: 1px solid rgba(255,255,255,.1); margin-top: 40px; padding-top: 22px; display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; font-size: 14px; color: #8aa0b3; }
 
 /* =============================================================
