@@ -124,8 +124,8 @@ window.MINT_CONFIG = {
     // Optional real live chat. Leave blank until you have an account.
     //   provider: "tawk"  -> id is "propertyId/widgetId" from your Tawk.to embed code
     //   provider: "crisp" -> id is your Crisp Website ID
-    // When set, "Live chat" appears as the first option in the same button.
-    liveChat: { provider: "tawk", id: "6a8ace66c80352344a658473/1k0n3cgb9" },
+    // "Live chat" only appears once the provider has actually loaded.
+    liveChat: { provider: "tawk", id: "6a8ad870c19bf93443db9d67/1k0n5qumh" },
   },
 
   /* ---------- 8. PORTFOLIO (optional) ----------
