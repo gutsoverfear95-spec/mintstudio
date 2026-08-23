@@ -13,7 +13,7 @@ window.MINT_CONFIG = {
     name: "Mint Studio",
     tagline: "Real estate photo editing that sells the space.",
     email: "hello@mintstudio.com",        // <-- your contact email
-    phone: "+1 (555) 123-4567",           // <-- your phone / WhatsApp
+    phone: "+84 984 329 695",             // <-- your phone / WhatsApp
     instagram: "https://instagram.com/",  // <-- your social links
     currency: "USD",
     currencySymbol: "$",
@@ -117,15 +117,15 @@ window.MINT_CONFIG = {
      Leave a field blank and that channel is simply hidden.
      Email uses business.email from section 1. */
   support: {
-    whatsapp: "",   // digits only, with country code. e.g. "84901234567"
-    telegram: "",   // your username without the @. e.g. "mintstudio"
+    whatsapp: "84984329695",   // digits only, with country code (+84 984 329 695)
+    telegram: "mintsvn",       // username without the @
     note: "We usually reply within a few minutes.",
 
     // Optional real live chat. Leave blank until you have an account.
     //   provider: "tawk"  -> id is "propertyId/widgetId" from your Tawk.to embed code
     //   provider: "crisp" -> id is your Crisp Website ID
     // When set, "Live chat" appears as the first option in the same button.
-    liveChat: { provider: "", id: "" },
+    liveChat: { provider: "tawk", id: "6a8ace66c80352344a658473/1k0n3cgb9" },
   },
 
   /* ---------- 8. PORTFOLIO (optional) ----------
