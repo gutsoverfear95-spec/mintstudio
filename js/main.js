@@ -141,7 +141,104 @@
     }).join("");
   }
 
+  /* ---------- Live chat loader (optional, see config.support.liveChat) ----------
+     We hide the provider's own bubble and open it from our button instead,
+     so the corner never shows two overlapping widgets. */
+  function initLiveChat() {
+    var lc = ((CFG.support || {}).liveChat) || {};
+    if (!lc.provider || !lc.id) return null;
+
+    if (lc.provider === "tawk") {
+      window.Tawk_API = window.Tawk_API || {};
+      window.Tawk_API.onLoad = function () { try { window.Tawk_API.hideWidget(); } catch (e) {} };
+      var t = document.createElement("script");
+      t.async = true; t.src = "https://embed.tawk.to/" + lc.id;
+      t.charset = "UTF-8"; t.setAttribute("crossorigin", "*");
+      document.head.appendChild(t);
+      return function () { try { window.Tawk_API.maximize(); } catch (e) {} };
+    }
+
+    if (lc.provider === "crisp") {
+      window.$crisp = []; window.CRISP_WEBSITE_ID = lc.id;
+      window.$crisp.push(["do", "chat:hide"]);
+      var c = document.createElement("script");
+      c.src = "https://client.crisp.chat/l.js"; c.async = 1;
+      document.head.appendChild(c);
+      return function () {
+        window.$crisp.push(["do", "chat:show"]);
+        window.$crisp.push(["do", "chat:open"]);
+      };
+    }
+    return null;
+  }
+
+  /* ---------- Floating support widget ---------- */
+  function support() {
+    var s = CFG.support || {}, b = CFG.business || {};
+    var openLiveChat = initLiveChat();
+
+    var ico = {
+      chat: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.9 8.9 0 0 1-3.8-.9L3 21l1.9-5a8.4 8.4 0 0 1 3.7-11.3 8.9 8.9 0 0 1 9.5 1.3 8.4 8.4 0 0 1 2.9 5.5z"/></svg>',
+      close: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+      wa: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.9 8.9 0 0 1-3.8-.9L3 21l1.9-5a8.4 8.4 0 0 1 3.7-11.3 8.9 8.9 0 0 1 9.5 1.3 8.4 8.4 0 0 1 2.9 5.5z"/><path d="M8.5 9.5c0 3 2.5 5.5 5.5 5.5l1-1.2-1.8-1-.8.8a4.6 4.6 0 0 1-2-2l.8-.8-1-1.8z" fill="currentColor" stroke="none"/></svg>',
+      tg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3 2 10.5l6 2.2L20 6l-9 8.2.4 5.3 3-3.7 4.3 3.2z"/></svg>',
+      mail: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>',
+      live: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10h8M8 14h5"/><path d="M21 12a8 8 0 0 1-8 8H7l-4 3V12a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8z"/></svg>'
+    };
+
+    var items = [];
+    if (openLiveChat) items.push({ live: true, name: "Live chat", sub: "Talk to us right here", bg: "var(--coral)", icon: ico.live });
+    if (s.whatsapp) items.push({
+      name: "WhatsApp", sub: "Fastest reply", bg: "#25D366", icon: ico.wa,
+      href: "https://wa.me/" + String(s.whatsapp).replace(/[^0-9]/g, "")
+    });
+    if (s.telegram) items.push({
+      name: "Telegram", sub: "Message us", bg: "#229ED9", icon: ico.tg,
+      href: "https://t.me/" + String(s.telegram).replace(/^@/, "")
+    });
+    if (b.email) items.push({ name: "Email", sub: b.email, bg: "var(--mint-600)", icon: ico.mail, href: "mailto:" + b.email });
+    if (!items.length) return;
+
+    var wrap = document.createElement("div");
+    wrap.className = "support";
+    wrap.innerHTML =
+      '<div class="support-panel" role="dialog" aria-label="Contact support">' +
+        '<div class="support-head"><b>Need a hand?</b><span>Pick a channel — we’re happy to help.</span></div>' +
+        '<div class="support-list">' +
+          items.map(function (it) {
+            var inner = '<span class="si" style="background:' + it.bg + '">' + it.icon + '</span>' +
+                        '<span>' + it.name + '<small>' + it.sub + '</small></span>';
+            return it.live
+              ? '<button type="button" class="support-item" data-live="1">' + inner + '</button>'
+              : '<a class="support-item" href="' + it.href + '" target="_blank" rel="noopener">' + inner + '</a>';
+          }).join("") +
+        '</div>' +
+        (s.note ? '<p class="support-note">' + s.note + '</p>' : "") +
+      '</div>' +
+      '<button class="support-fab" aria-label="Contact support" aria-expanded="false">' +
+        '<span class="ic-chat">' + ico.chat + '</span><span class="ic-close">' + ico.close + '</span>' +
+      '</button>';
+    document.body.appendChild(wrap);
+
+    var fab = $(".support-fab", wrap);
+    function setOpen(on) {
+      wrap.classList.toggle("open", on);
+      fab.setAttribute("aria-expanded", on ? "true" : "false");
+    }
+    fab.addEventListener("click", function (e) {
+      e.stopPropagation();
+      setOpen(!wrap.classList.contains("open"));
+    });
+    var liveBtn = $("[data-live]", wrap);
+    if (liveBtn && openLiveChat) liveBtn.addEventListener("click", function () { setOpen(false); openLiveChat(); });
+    $$(".support-item", wrap).forEach(function (el) {
+      el.addEventListener("click", function () { if (!el.hasAttribute("data-live")) setOpen(false); });
+    });
+    document.addEventListener("click", function (e) { if (!wrap.contains(e.target)) setOpen(false); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") setOpen(false); });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
-    fillBusiness(); nav(); faq(); pricing(); baAll(); reveal();
+    fillBusiness(); nav(); faq(); pricing(); baAll(); reveal(); support();
   });
 })();
