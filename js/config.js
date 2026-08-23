@@ -113,7 +113,22 @@ window.MINT_CONFIG = {
      Leave blank to skip — the order still proceeds to payment. */
   web3formsAccessKey: "",     // <-- get a free key at web3forms.com
 
-  /* ---------- 7. PORTFOLIO (optional) ----------
+  /* ---------- 7. SUPPORT CHAT (floating button, bottom-right) ----------
+     Leave a field blank and that channel is simply hidden.
+     Email uses business.email from section 1. */
+  support: {
+    whatsapp: "",   // digits only, with country code. e.g. "84901234567"
+    telegram: "",   // your username without the @. e.g. "mintstudio"
+    note: "We usually reply within a few minutes.",
+
+    // Optional real live chat. Leave blank until you have an account.
+    //   provider: "tawk"  -> id is "propertyId/widgetId" from your Tawk.to embed code
+    //   provider: "crisp" -> id is your Crisp Website ID
+    // When set, "Live chat" appears as the first option in the same button.
+    liveChat: { provider: "", id: "" },
+  },
+
+  /* ---------- 8. PORTFOLIO (optional) ----------
      Swap these for your own before/after image URLs.
      Leave as-is to use the built-in sample placeholders. */
   portfolio: [
