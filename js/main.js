@@ -144,13 +144,16 @@
   /* ---------- Live chat loader (optional, see config.support.liveChat) ----------
      We hide the provider's own bubble and open it from our button instead,
      so the corner never shows two overlapping widgets. */
-  function initLiveChat() {
+  function initLiveChat(onReady) {
     var lc = ((CFG.support || {}).liveChat) || {};
     if (!lc.provider || !lc.id) return null;
 
     if (lc.provider === "tawk") {
       window.Tawk_API = window.Tawk_API || {};
-      window.Tawk_API.onLoad = function () { try { window.Tawk_API.hideWidget(); } catch (e) {} };
+      window.Tawk_API.onLoad = function () {
+        try { window.Tawk_API.hideWidget(); } catch (e) {}
+        if (onReady) onReady();
+      };
       var t = document.createElement("script");
       t.async = true; t.src = "https://embed.tawk.to/" + lc.id;
       t.charset = "UTF-8"; t.setAttribute("crossorigin", "*");
@@ -161,6 +164,7 @@
     if (lc.provider === "crisp") {
       window.$crisp = []; window.CRISP_WEBSITE_ID = lc.id;
       window.$crisp.push(["do", "chat:hide"]);
+      window.$crisp.push(["on", "session:loaded", function () { if (onReady) onReady(); }]);
       var c = document.createElement("script");
       c.src = "https://client.crisp.chat/l.js"; c.async = 1;
       document.head.appendChild(c);
@@ -175,7 +179,16 @@
   /* ---------- Floating support widget ---------- */
   function support() {
     var s = CFG.support || {}, b = CFG.business || {};
-    var openLiveChat = initLiveChat();
+
+    // "Live chat" stays hidden until the provider actually loads, so a broken
+    // or misconfigured account never leaves customers clicking a dead option.
+    var liveReady = false;
+    function revealLive() {
+      liveReady = true;
+      var el = document.querySelector(".support-item[data-live]");
+      if (el) el.style.display = "flex";
+    }
+    var openLiveChat = initLiveChat(revealLive);
 
     var ico = {
       chat: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.9 8.9 0 0 1-3.8-.9L3 21l1.9-5a8.4 8.4 0 0 1 3.7-11.3 8.9 8.9 0 0 1 9.5 1.3 8.4 8.4 0 0 1 2.9 5.5z"/></svg>',
@@ -209,7 +222,7 @@
             var inner = '<span class="si" style="background:' + it.bg + '">' + it.icon + '</span>' +
                         '<span>' + it.name + '<small>' + it.sub + '</small></span>';
             return it.live
-              ? '<button type="button" class="support-item" data-live="1">' + inner + '</button>'
+              ? '<button type="button" class="support-item" data-live="1" style="display:' + (liveReady ? "flex" : "none") + '">' + inner + '</button>'
               : '<a class="support-item" href="' + it.href + '" target="_blank" rel="noopener">' + inner + '</a>';
           }).join("") +
         '</div>' +
