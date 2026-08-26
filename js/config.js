@@ -2,7 +2,7 @@
    MINT STUDIO — SITE CONFIGURATION
    -------------------------------------------------------------
    This is the ONLY file you normally need to edit.
-   Everything below (prices, services, Stripe links, contact info)
+   Everything below (prices, services, payment links, contact info)
    controls what shows on the website. Save the file and refresh.
    ============================================================= */
 
@@ -23,10 +23,10 @@ window.MINT_CONFIG = {
 
   /* ---------- 2. PRICING PACKAGES (per photo) ----------
      These are placeholder prices — edit freely.
-     "stripeLink"  = a Stripe Payment Link for this package
-                     (see README → "Connect Stripe").
-     "priceId"     = only needed if you use the advanced
-                     Stripe Checkout mode (paymentMode below). */
+     ⚠️ If you change a price here, change it in api/crypto-invoice.js too.
+     "cryptoLink"  = optional fixed payment link, used only if the
+                     invoice endpoint is unreachable.
+     "stripeLink" / "priceId" = only used by the Stripe modes. */
   packages: [
     {
       id: "essentials",
@@ -40,8 +40,9 @@ window.MINT_CONFIG = {
         "Basic spot cleanup",
         "Sharpening & straightening",
       ],
-      stripeLink: "",   // <-- paste your Stripe Payment Link
-      priceId: "",      // <-- optional (advanced checkout mode)
+      stripeLink: "",
+      cryptoLink: "",   // <-- optional fallback: a fixed NOWPayments link
+      priceId: "",
       popular: false,
     },
     {
@@ -58,6 +59,7 @@ window.MINT_CONFIG = {
         "Lawn & greenery boost",
       ],
       stripeLink: "",
+      cryptoLink: "",   // <-- optional fallback: a fixed NOWPayments link
       priceId: "",
       popular: true,
     },
@@ -74,6 +76,7 @@ window.MINT_CONFIG = {
         "Priority 12h turnaround",
       ],
       stripeLink: "",
+      cryptoLink: "",   // <-- optional fallback: a fixed NOWPayments link
       priceId: "",
       popular: false,
     },
@@ -92,18 +95,20 @@ window.MINT_CONFIG = {
   rush: { label: "Rush 12-hour turnaround (+50%)", multiplier: 0.5 },
 
   /* ---------- 5. PAYMENT MODE ----------
-     "payment_link"    -> simplest. Customer is sent to the Stripe
-                          Payment Link of the chosen package to pay.
-                          (Set pricePerPhoto on Stripe as per-photo
-                          with "adjustable quantity" on.)  DEFAULT.
+     "crypto"          -> CURRENT. Creates a NOWPayments invoice for the
+                          exact total via /api/crypto-invoice, then sends
+                          the customer there to pay in any coin they like
+                          (USDT TRC20/BEP20, USDC, BTC, ETH, ...).
+                          Needs NOWPAYMENTS_API_KEY set in Vercel.
+                          If that call fails, the customer is sent to the
+                          package's "cryptoLink" instead (if you set one).
 
-     "stripe_checkout" -> advanced. Charges the EXACT computed total
-                          (package + add-ons) in one go using Stripe.js.
-                          Requires stripePublishableKey + every priceId
-                          above, and client-only Checkout enabled in
-                          your Stripe dashboard. See README. */
-  paymentMode: "payment_link",
-  stripePublishableKey: "",   // pk_live_... or pk_test_...  (checkout mode only)
+     "payment_link"    -> Stripe Payment Link per package.
+
+     "stripe_checkout" -> Stripe.js checkout for the exact total.
+                          Requires stripePublishableKey + every priceId. */
+  paymentMode: "crypto",
+  stripePublishableKey: "",   // pk_live_... or pk_test_...  (Stripe checkout only)
   successUrl: "success.html", // page shown after payment
   cancelUrl: "order.html",
 
@@ -121,7 +126,6 @@ window.MINT_CONFIG = {
     telegram: "mintsvn",       // username without the @
     note: "We usually reply within a few minutes.",
 
-    // Optional real live chat. Leave blank until you have an account.
     //   provider: "tawk"  -> id is "propertyId/widgetId" from your Tawk.to embed code
     //   provider: "crisp" -> id is your Crisp Website ID
     // "Live chat" only appears once the provider has actually loaded.
