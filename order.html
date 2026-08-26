@@ -10,10 +10,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <link rel="icon" href="assets/favicon.svg">
+<!-- Stripe.js — only used in "stripe_checkout" mode. Harmless otherwise. -->
 <script src="https://js.stripe.com/v3/"></script>
 </head>
 <body>
 
+<!-- ===== Header ===== -->
 <header class="site-header">
   <div class="container nav">
     <a class="brand" href="index.html">
@@ -33,6 +35,7 @@
   </div>
 </header>
 
+<!-- ===== Page hero ===== -->
 <section class="page-hero">
   <div class="container">
     <span class="eyebrow">Place an order</span>
@@ -41,10 +44,12 @@
   </div>
 </section>
 
+<!-- ===== Order form ===== -->
 <section class="section" style="padding-top:34px">
   <div class="container">
     <form id="order-form" class="order-wrap" novalidate>
 
+      <!-- LEFT: the form -->
       <div class="order-form">
 
         <div class="banner">
@@ -52,26 +57,30 @@
           <span>Upload your files anywhere (Google Drive, Dropbox, WeTransfer) and paste the share link below — no large uploads needed here.</span>
         </div>
 
+        <!-- 1. Package -->
         <h3 style="margin-bottom:14px">1. Choose your package</h3>
         <div class="field">
-          <div class="pkg-options" id="pkg-options"></div>
+          <div class="pkg-options" id="pkg-options"><!-- rendered by order.js --></div>
         </div>
 
+        <!-- 2. Photos -->
         <h3 style="margin:26px 0 14px">2. How many photos?</h3>
         <div class="field">
           <label for="photos">Number of photos <span class="hint">— per-photo pricing applies</span></label>
           <input type="number" id="photos" min="1" max="2000" value="10" required>
         </div>
 
+        <!-- 3. Add-ons -->
         <h3 style="margin:26px 0 14px">3. Add extras <span class="hint" style="font-weight:600">(optional, priced per photo)</span></h3>
         <div class="field">
-          <div class="addon-grid" id="addon-grid"></div>
+          <div class="addon-grid" id="addon-grid"><!-- rendered by order.js --></div>
         </div>
         <div class="field check-row">
           <input type="checkbox" id="rush">
           <label for="rush" id="rush-label" style="margin:0">Rush turnaround</label>
         </div>
 
+        <!-- 4. Your details -->
         <h3 style="margin:26px 0 14px">4. Your details</h3>
         <div class="field-row">
           <div class="field"><label for="f-name">Full name</label><input type="text" id="f-name" required></div>
@@ -94,6 +103,7 @@
         <div id="pay-msg" style="display:none;background:var(--mint-tint);border:1px solid #bfeede;color:#04241c;border-radius:12px;padding:14px 16px;font-size:14px;margin-top:10px"></div>
       </div>
 
+      <!-- RIGHT: sticky summary -->
       <aside class="summary">
         <div class="card">
           <h3>Order summary</h3>
@@ -106,9 +116,9 @@
           </button>
           <div class="pay-badges">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-            Secured by Stripe · SSL encrypted
+            Pay in crypto · USDT, USDC, BTC, ETH and more
           </div>
-          <p class="note">By placing an order you agree to our editing terms. Payment is taken in advance to confirm your booking.</p>
+          <p class="note">Prices are in USD. You'll pick your coin and network on the next page. Payment is taken in advance to confirm your booking.</p>
         </div>
       </aside>
 
@@ -116,6 +126,7 @@
   </div>
 </section>
 
+<!-- ===== Footer (compact) ===== -->
 <footer class="site-footer" style="padding:36px 0 26px">
   <div class="container footer-bottom" style="border:0;margin:0;padding:0">
     <span>© <span data-mint="year">2026</span> <span data-mint="name">Mint Studio</span>.</span>
