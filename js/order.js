@@ -1,7 +1,7 @@
 /* =============================================================
    MINT STUDIO — order.js
    Renders the order form, computes the live total, and starts
-   payment (Stripe Payment Link or Stripe.js Checkout).
+   payment (crypto invoice, Stripe Payment Link or Stripe Checkout).
    ============================================================= */
 (function () {
   "use strict";
@@ -105,6 +105,30 @@
     }).catch(function () { /* don't block payment if notify fails */ });
   }
 
+  /* ---------- Crypto invoice (NOWPayments via /api/crypto-invoice) ----------
+     The serverless function recalculates the total from its own price
+     table, so the amount can't be tampered with in the browser. */
+  function cryptoInvoice(d) {
+    return fetch("/api/crypto-invoice", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        packageId: d.s.pkg.id,
+        photos: d.s.photos,
+        addons: d.s.addons.map(function (a) { return a.id; }),
+        rush: d.s.rush,
+        name: d.fields.name,
+        email: d.fields.email
+      })
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (j) {
+        if (!r.ok || !j.invoice_url) throw new Error(j.error || "Invoice failed");
+        try { sessionStorage.setItem("mint_last_orderid", j.order_id || ""); } catch (e) {}
+        window.location.href = j.invoice_url;
+      });
+    });
+  }
+
   /* ---------- Stripe.js checkout (advanced exact-total mode) ---------- */
   function stripeCheckout(d) {
     return new Promise(function (resolve, reject) {
@@ -145,6 +169,14 @@
     try { sessionStorage.setItem("mint_last_order", orderText(d)); sessionStorage.setItem("mint_last_total", money(d.c.total)); } catch (err) {}
 
     notify(d).then(function () {
+      // Crypto: exact-total invoice, falling back to a fixed link per package.
+      if (CFG.paymentMode === "crypto") {
+        return cryptoInvoice(d).catch(function (err) {
+          var link = d.s.pkg.cryptoLink;
+          if (link) { window.location.href = link; return; }
+          fallback(d, btn, txt, err);
+        });
+      }
       if (CFG.paymentMode === "stripe_checkout") {
         return stripeCheckout(d).catch(function (err) { fallback(d, btn, txt, err); });
       }
@@ -159,7 +191,7 @@
     });
   }
 
-  // Shown when Stripe isn't connected yet — order still captured.
+  // Shown when the payment provider isn't reachable — order still captured.
   function fallback(d, btn, txt, err) {
     btn.disabled = false; btn.textContent = txt;
     var box = $("#pay-msg");
@@ -168,8 +200,8 @@
     box.innerHTML = (sent
       ? "✓ Your order request was sent to our studio. "
       : "Online payment isn’t connected yet. ") +
-      "We’ll email you a secure Stripe payment link at <b>" + (d.fields.email || "your email") + "</b> shortly. " +
-      "<br><span style='color:#6b7d92;font-size:12px'>(Studio note: add your Stripe Payment Links in <code>js/config.js</code> to charge instantly.)</span>";
+      "We’ll email you a secure payment link at <b>" + (d.fields.email || "your email") + "</b> shortly. " +
+      "<br><span style='color:#6b7d92;font-size:12px'>(Studio note: check that NOWPAYMENTS_API_KEY is set in Vercel, or add a fallback link in <code>js/config.js</code>.)</span>";
     box.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
